@@ -20,7 +20,7 @@ function Modal({ isOpen, onClose, title, children }) {
       document.body.style.overflow = '';
       prevFocus?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]); // Removed onClose from dependencies to prevent focus stealing on re-renders
 
   if (!isOpen) return null;
 
