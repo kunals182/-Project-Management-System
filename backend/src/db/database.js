@@ -3,8 +3,9 @@ const initSqlJs = require('sql.js');
 const path      = require('path');
 const fs        = require('fs');
 
-const DATA_DIR = path.join(__dirname, '../../../data');
-const DB_PATH  = path.join(DATA_DIR, 'projectmanager.db');
+const IS_VERCEL = process.env.VERCEL === '1' || !!process.env.VERCEL;
+const DATA_DIR  = IS_VERCEL ? '/tmp' : path.join(__dirname, '../../../data');
+const DB_PATH   = path.join(DATA_DIR, 'projectmanager.db');
 
 let db = null;
 let dbPromise = null;

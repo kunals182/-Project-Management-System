@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/' });
+const baseURL = import.meta.env.DEV ? '/' : '/_/backend';
+const api = axios.create({ baseURL });
 
 export const getProjects = (page = 1, limit = 9) =>
   api.get('/projects', { params: { page, limit } }).then(r => r.data);
