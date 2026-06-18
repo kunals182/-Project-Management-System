@@ -16,7 +16,8 @@ function formatDueDate(dateStr) {
   if (!dateStr) return null;
   const d    = new Date(dateStr + 'T00:00:00');
   const now  = new Date();
-  const diff = Math.ceil((d - now) / 86400000);
+  now.setHours(0, 0, 0, 0);
+  const diff = Math.round((d - now) / 86400000);
 
   const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 

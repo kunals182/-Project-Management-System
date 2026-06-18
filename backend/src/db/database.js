@@ -7,26 +7,33 @@ const DATA_DIR = path.join(__dirname, '../../../data');
 const DB_PATH  = path.join(DATA_DIR, 'projectmanager.db');
 
 let db = null;
+let dbPromise = null;
 
 async function getDb() {
-  if (db) return db;
+  if (dbPromise) return dbPromise;
 
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
-  }
+  dbPromise = (async () => {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
 
-  const SQL = await initSqlJs();
+    const SQL = await initSqlJs();
 
-  if (fs.existsSync(DB_PATH)) {
-    const fileBuffer = fs.readFileSync(DB_PATH);
-    db = new SQL.Database(fileBuffer);
-  } else {
-    db = new SQL.Database();
-  }
+    let database;
+    if (fs.existsSync(DB_PATH)) {
+      const fileBuffer = fs.readFileSync(DB_PATH);
+      database = new SQL.Database(fileBuffer);
+    } else {
+      database = new SQL.Database();
+    }
 
-  runMigrations();
-  persist();
-  return db;
+    db = database;
+    runMigrations();
+    persist();
+    return database;
+  })();
+
+  return dbPromise;
 }
 
 function runMigrations() {
@@ -61,12 +68,15 @@ function persist() {
 }
 
 function queryAll(sql, params = []) {
-  const stmt    = db.prepare(sql);
-  const results = [];
-  stmt.bind(params);
-  while (stmt.step()) results.push(stmt.getAsObject());
-  stmt.free();
-  return results;
+  const stmt = db.prepare(sql);
+  try {
+    const results = [];
+    stmt.bind(params);
+    while (stmt.step()) results.push(stmt.getAsObject());
+    return results;
+  } finally {
+    stmt.free();
+  }
 }
 
 function queryOne(sql, params = []) {

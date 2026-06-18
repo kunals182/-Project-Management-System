@@ -4,13 +4,19 @@ import './Modal.css';
 function Modal({ isOpen, onClose, title, children }) {
   const dialogRef = useRef(null);
 
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
     const prevFocus = document.activeElement;
     dialogRef.current?.focus();
 
     function onKeyDown(e) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     }
     document.addEventListener('keydown', onKeyDown);
     document.body.style.overflow = 'hidden';
@@ -20,7 +26,7 @@ function Modal({ isOpen, onClose, title, children }) {
       document.body.style.overflow = '';
       prevFocus?.focus();
     };
-  }, [isOpen]); // Removed onClose from dependencies to prevent focus stealing on re-renders
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

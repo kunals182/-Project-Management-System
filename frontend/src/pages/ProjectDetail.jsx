@@ -56,11 +56,11 @@ function ProjectDetail() {
   useEffect(() => {
     setLoading(true);
     Promise.all([loadProject(), loadTasks()]).finally(() => setLoading(false));
-  }, [loadProject]);
+  }, [loadProject, loadTasks]);
 
   useEffect(() => {
     if (!loading) loadTasks();
-  }, [filters]);
+  }, [loadTasks, loading]);
 
   function openCreate() {
     setEditingTask(null);
